@@ -1,0 +1,17 @@
+[package]
+name = "term"
+version = "0.1.0"
+edition = "2024"
+description = "Olive term package — raw-mode terminal, keyboard/mouse input, and TUI primitives"
+license = "Apache-2.0"
+repository = "https://github.com/ecnivslabs/term"
+keywords = ["olive", "terminal", "tui", "crossterm"]
+categories = ["command-line-interface"]
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+crossterm = "0.28"
+base64 = "0.22"
+libc = "0.2"

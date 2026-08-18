@@ -1,0 +1,117 @@
+import "./libolivetterm.so" as _t:
+    @cdecl fn olive_term_enable_raw() -> int
+    @cdecl fn olive_term_disable_raw() -> int
+    @cdecl fn olive_term_enter_alt_screen() -> int
+    @cdecl fn olive_term_leave_alt_screen() -> int
+    @cdecl fn olive_term_clear() -> int
+    @cdecl fn olive_term_cursor_hide() -> int
+    @cdecl fn olive_term_cursor_show() -> int
+    @cdecl fn olive_term_cursor_move(x: int, y: int) -> int
+    @cdecl fn olive_term_flush() -> int
+    @cdecl fn olive_term_write(s: str) -> int
+    @cdecl fn olive_term_begin_sync() -> int
+    @cdecl fn olive_term_end_sync() -> int
+    @cdecl fn olive_term_cols() -> int
+    @cdecl fn olive_term_rows() -> int
+    @cdecl fn olive_term_is_tty() -> int
+    @cdecl fn olive_term_enable_key_enhancement() -> int
+    @cdecl fn olive_term_disable_key_enhancement() -> int
+    @cdecl fn olive_term_enable_mouse() -> int
+    @cdecl fn olive_term_disable_mouse() -> int
+    @cdecl fn olive_term_clipboard_write(s: str) -> int
+    @cdecl fn olive_term_read_key() -> str
+    @cdecl fn olive_term_read_key_timeout(ms: int) -> str
+
+/// Turn on raw mode. Keys come in as you type them, no buffering, no echo.
+fn enable_raw() -> bool:
+    return _t.olive_term_enable_raw() != 0
+
+/// Turn off raw mode and go back to normal terminal behavior.
+fn disable_raw() -> bool:
+    return _t.olive_term_disable_raw() != 0
+
+/// Switch to the alternate screen. The user's shell output stays untouched underneath.
+fn enter_alt_screen() -> bool:
+    return _t.olive_term_enter_alt_screen() != 0
+
+/// Go back to the normal screen.
+fn leave_alt_screen() -> bool:
+    return _t.olive_term_leave_alt_screen() != 0
+
+/// Clear everything on screen.
+fn clear() -> bool:
+    return _t.olive_term_clear() != 0
+
+/// Hide the cursor.
+fn cursor_hide() -> bool:
+    return _t.olive_term_cursor_hide() != 0
+
+/// Show the cursor again.
+fn cursor_show() -> bool:
+    return _t.olive_term_cursor_show() != 0
+
+/// Move the cursor to column x, row y. Both are 0-based.
+fn cursor_move(x: int, y: int) -> bool:
+    return _t.olive_term_cursor_move(x, y) != 0
+
+/// Flush any buffered output to the screen right now.
+fn flush() -> bool:
+    return _t.olive_term_flush() != 0
+
+/// Write a string to the terminal. No newline added.
+fn write(s: str) -> bool:
+    return _t.olive_term_write(s) != 0
+
+/// Start batching writes. Nothing gets drawn until you call end_sync().
+/// Useful for redrawing a frame without flicker.
+fn begin_sync() -> bool:
+    return _t.olive_term_begin_sync() != 0
+
+/// Stop batching and flush everything at once.
+fn end_sync() -> bool:
+    return _t.olive_term_end_sync() != 0
+
+/// How many columns wide the terminal is.
+fn cols() -> int:
+    return _t.olive_term_cols()
+
+/// How many rows tall the terminal is.
+fn rows() -> int:
+    return _t.olive_term_rows()
+
+/// Returns true if stdout is a real terminal, not a pipe or file.
+fn is_tty() -> bool:
+    return _t.olive_term_is_tty() != 0
+
+/// Ask the terminal for better key events, like telling shift+enter apart from enter.
+/// Does nothing if the terminal does not support it.
+fn enable_key_enhancement() -> bool:
+    return _t.olive_term_enable_key_enhancement() != 0
+
+/// Turn off the enhanced key events.
+fn disable_key_enhancement() -> bool:
+    return _t.olive_term_disable_key_enhancement() != 0
+
+/// Start receiving mouse clicks, drags, and scroll events.
+fn enable_mouse() -> bool:
+    return _t.olive_term_enable_mouse() != 0
+
+/// Stop receiving mouse events.
+fn disable_mouse() -> bool:
+    return _t.olive_term_disable_mouse() != 0
+
+/// Copy text to the clipboard. Works over SSH and inside tmux too.
+fn clipboard_write(s: str) -> bool:
+    return _t.olive_term_clipboard_write(s) != 0
+
+/// Wait for the next key press, mouse event, or window resize and return it as a string.
+/// Key names look like "enter", "ctrl+c", "shift+up", "f5", etc.
+/// Mouse events look like "mousedown:10:3", "wheelup", etc.
+/// Returns "resize" when the window size changes, "eof" when input closes.
+/// If you get "eof", stop calling this. It will keep returning "eof".
+fn read_key() -> str:
+    return _t.olive_term_read_key()
+
+/// Like read_key() but gives up after ms milliseconds and returns "idle".
+fn read_key_timeout(ms: int) -> str:
+    return _t.olive_term_read_key_timeout(ms)
