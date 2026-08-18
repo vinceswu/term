@@ -133,9 +133,42 @@ fn disable_mouse() -> bool:
 fn clipboard_write(s: str) -> bool:
     return _t.olive_term_clipboard_write(s) != 0
 
-const _MOD_PREFIXES = ["", "ctrl+", "alt+", "shift+", "ctrl+alt+", "ctrl+shift+", "alt+shift+", "ctrl+alt+shift+"]
-const _MOD_NAMES = ["", "ctrl", "alt", "shift", "ctrl+alt", "ctrl+shift", "alt+shift", "ctrl+alt+shift"]
-const _NAMED_BASES = ["up", "down", "left", "right", "home", "end", "delete", "backspace", "tab", "backtab", "escape", "pageup", "pagedown", "insert"]
+const _MOD_PREFIXES = [
+    "",
+    "ctrl+",
+    "alt+",
+    "shift+",
+    "ctrl+alt+",
+    "ctrl+shift+",
+    "alt+shift+",
+    "ctrl+alt+shift+",
+]
+const _MOD_NAMES = [
+    "",
+    "ctrl",
+    "alt",
+    "shift",
+    "ctrl+alt",
+    "ctrl+shift",
+    "alt+shift",
+    "ctrl+alt+shift",
+]
+const _NAMED_BASES = [
+    "up",
+    "down",
+    "left",
+    "right",
+    "home",
+    "end",
+    "delete",
+    "backspace",
+    "tab",
+    "backtab",
+    "escape",
+    "pageup",
+    "pagedown",
+    "insert",
+]
 
 fn _bare_named(base: str) -> Key:
     if base == "up":
@@ -255,7 +288,7 @@ fn _decode(tag: str) -> Key:
 fn _find_colon(s: str) -> int:
     let mut i = 0
     while i < len(s):
-        if s[i:i+1] == ":":
+        if s[i:i + 1] == ":":
             return i
         i = i + 1
     return -1

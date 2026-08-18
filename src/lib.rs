@@ -407,41 +407,86 @@ mod tests {
 
     #[test]
     fn encode_key_plain_enter() {
-        assert_eq!(encode_key(KeyCode::Enter, KeyModifiers::NONE), Some("enter".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::Enter, KeyModifiers::NONE),
+            Some("enter".to_string())
+        );
     }
 
     #[test]
     fn encode_key_shift_enter() {
-        assert_eq!(encode_key(KeyCode::Enter, KeyModifiers::SHIFT), Some("shift+enter".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::Enter, KeyModifiers::SHIFT),
+            Some("shift+enter".to_string())
+        );
     }
 
     #[test]
     fn encode_key_ctrl_c() {
-        assert_eq!(encode_key(KeyCode::Char('c'), KeyModifiers::CONTROL), Some("ctrl+c".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::Char('c'), KeyModifiers::CONTROL),
+            Some("ctrl+c".to_string())
+        );
     }
 
     #[test]
     fn encode_key_plain_char() {
-        assert_eq!(encode_key(KeyCode::Char('x'), KeyModifiers::NONE), Some("x".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::Char('x'), KeyModifiers::NONE),
+            Some("x".to_string())
+        );
     }
 
     #[test]
     fn encode_key_shift_char_is_uppercase_via_crossterm() {
-        assert_eq!(encode_key(KeyCode::Char('X'), KeyModifiers::SHIFT), Some("X".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::Char('X'), KeyModifiers::SHIFT),
+            Some("X".to_string())
+        );
     }
 
     #[test]
     fn encode_key_named_keys() {
-        assert_eq!(encode_key(KeyCode::Backspace, KeyModifiers::NONE), Some("backspace".to_string()));
-        assert_eq!(encode_key(KeyCode::Tab, KeyModifiers::NONE), Some("tab".to_string()));
-        assert_eq!(encode_key(KeyCode::Esc, KeyModifiers::NONE), Some("escape".to_string()));
-        assert_eq!(encode_key(KeyCode::Up, KeyModifiers::NONE), Some("up".to_string()));
-        assert_eq!(encode_key(KeyCode::Down, KeyModifiers::NONE), Some("down".to_string()));
-        assert_eq!(encode_key(KeyCode::Left, KeyModifiers::NONE), Some("left".to_string()));
-        assert_eq!(encode_key(KeyCode::Right, KeyModifiers::NONE), Some("right".to_string()));
-        assert_eq!(encode_key(KeyCode::Home, KeyModifiers::NONE), Some("home".to_string()));
-        assert_eq!(encode_key(KeyCode::End, KeyModifiers::NONE), Some("end".to_string()));
-        assert_eq!(encode_key(KeyCode::Delete, KeyModifiers::NONE), Some("delete".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::Backspace, KeyModifiers::NONE),
+            Some("backspace".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Tab, KeyModifiers::NONE),
+            Some("tab".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Esc, KeyModifiers::NONE),
+            Some("escape".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Up, KeyModifiers::NONE),
+            Some("up".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Down, KeyModifiers::NONE),
+            Some("down".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Left, KeyModifiers::NONE),
+            Some("left".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Right, KeyModifiers::NONE),
+            Some("right".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Home, KeyModifiers::NONE),
+            Some("home".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::End, KeyModifiers::NONE),
+            Some("end".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Delete, KeyModifiers::NONE),
+            Some("delete".to_string())
+        );
     }
 
     #[test]
@@ -453,50 +498,97 @@ mod tests {
 
     #[test]
     fn encode_key_new_named_keys() {
-        assert_eq!(encode_key(KeyCode::PageUp, KeyModifiers::NONE), Some("pageup".to_string()));
-        assert_eq!(encode_key(KeyCode::PageDown, KeyModifiers::NONE), Some("pagedown".to_string()));
-        assert_eq!(encode_key(KeyCode::Insert, KeyModifiers::NONE), Some("insert".to_string()));
-        assert_eq!(encode_key(KeyCode::BackTab, KeyModifiers::NONE), Some("backtab".to_string()));
-        assert_eq!(encode_key(KeyCode::F(1), KeyModifiers::NONE), Some("f1".to_string()));
-        assert_eq!(encode_key(KeyCode::F(12), KeyModifiers::NONE), Some("f12".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::PageUp, KeyModifiers::NONE),
+            Some("pageup".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::PageDown, KeyModifiers::NONE),
+            Some("pagedown".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Insert, KeyModifiers::NONE),
+            Some("insert".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::BackTab, KeyModifiers::NONE),
+            Some("backtab".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::F(1), KeyModifiers::NONE),
+            Some("f1".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::F(12), KeyModifiers::NONE),
+            Some("f12".to_string())
+        );
     }
 
     #[test]
     fn encode_key_modified_named_keys() {
-        assert_eq!(encode_key(KeyCode::Up, KeyModifiers::SHIFT), Some("shift+up".to_string()));
-        assert_eq!(encode_key(KeyCode::Down, KeyModifiers::CONTROL), Some("ctrl+down".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::Up, KeyModifiers::SHIFT),
+            Some("shift+up".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Down, KeyModifiers::CONTROL),
+            Some("ctrl+down".to_string())
+        );
         assert_eq!(
             encode_key(KeyCode::Left, KeyModifiers::CONTROL | KeyModifiers::SHIFT),
             Some("ctrl+shift+left".to_string())
         );
         assert_eq!(
-            encode_key(KeyCode::Right, KeyModifiers::CONTROL | KeyModifiers::ALT | KeyModifiers::SHIFT),
+            encode_key(
+                KeyCode::Right,
+                KeyModifiers::CONTROL | KeyModifiers::ALT | KeyModifiers::SHIFT
+            ),
             Some("ctrl+alt+shift+right".to_string())
         );
-        assert_eq!(encode_key(KeyCode::F(5), KeyModifiers::ALT), Some("alt+f5".to_string()));
-        assert_eq!(encode_key(KeyCode::Enter, KeyModifiers::CONTROL), Some("ctrl+enter".to_string()));
+        assert_eq!(
+            encode_key(KeyCode::F(5), KeyModifiers::ALT),
+            Some("alt+f5".to_string())
+        );
+        assert_eq!(
+            encode_key(KeyCode::Enter, KeyModifiers::CONTROL),
+            Some("ctrl+enter".to_string())
+        );
     }
 
     #[test]
     fn encode_key_ctrl_takes_priority_over_shift_on_char() {
         assert_eq!(
-            encode_key(KeyCode::Char('c'), KeyModifiers::CONTROL | KeyModifiers::SHIFT),
+            encode_key(
+                KeyCode::Char('c'),
+                KeyModifiers::CONTROL | KeyModifiers::SHIFT
+            ),
             Some("ctrl+c".to_string())
         );
     }
 
     fn mouse_event(kind: MouseEventKind, column: u16, row: u16) -> MouseEvent {
-        MouseEvent { kind, column, row, modifiers: KeyModifiers::NONE }
+        MouseEvent {
+            kind,
+            column,
+            row,
+            modifiers: KeyModifiers::NONE,
+        }
     }
 
     #[test]
     fn encode_mouse_wheel_up() {
-        assert_eq!(encode_mouse(mouse_event(MouseEventKind::ScrollUp, 0, 0)), Some("wheelup".to_string()));
+        assert_eq!(
+            encode_mouse(mouse_event(MouseEventKind::ScrollUp, 0, 0)),
+            Some("wheelup".to_string())
+        );
     }
 
     #[test]
     fn encode_mouse_wheel_down() {
-        assert_eq!(encode_mouse(mouse_event(MouseEventKind::ScrollDown, 0, 0)), Some("wheeldown".to_string()));
+        assert_eq!(
+            encode_mouse(mouse_event(MouseEventKind::ScrollDown, 0, 0)),
+            Some("wheeldown".to_string())
+        );
     }
 
     #[test]
