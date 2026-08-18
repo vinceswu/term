@@ -1,26 +1,57 @@
-import "./libolivetterm.so" as _t:
-    @cdecl fn olive_term_enable_raw() -> int
-    @cdecl fn olive_term_disable_raw() -> int
-    @cdecl fn olive_term_enter_alt_screen() -> int
-    @cdecl fn olive_term_leave_alt_screen() -> int
-    @cdecl fn olive_term_clear() -> int
-    @cdecl fn olive_term_cursor_hide() -> int
-    @cdecl fn olive_term_cursor_show() -> int
-    @cdecl fn olive_term_cursor_move(x: int, y: int) -> int
-    @cdecl fn olive_term_flush() -> int
-    @cdecl fn olive_term_write(s: str) -> int
-    @cdecl fn olive_term_begin_sync() -> int
-    @cdecl fn olive_term_end_sync() -> int
-    @cdecl fn olive_term_cols() -> int
-    @cdecl fn olive_term_rows() -> int
-    @cdecl fn olive_term_is_tty() -> int
-    @cdecl fn olive_term_enable_key_enhancement() -> int
-    @cdecl fn olive_term_disable_key_enhancement() -> int
-    @cdecl fn olive_term_enable_mouse() -> int
-    @cdecl fn olive_term_disable_mouse() -> int
-    @cdecl fn olive_term_clipboard_write(s: str) -> int
-    @cdecl fn olive_term_read_key() -> str
-    @cdecl fn olive_term_read_key_timeout(ms: int) -> str
+import "./libterm.so" as _t:
+    @cdecl @safe fn olive_term_enable_raw() -> int
+    @cdecl @safe fn olive_term_disable_raw() -> int
+    @cdecl @safe fn olive_term_enter_alt_screen() -> int
+    @cdecl @safe fn olive_term_leave_alt_screen() -> int
+    @cdecl @safe fn olive_term_clear() -> int
+    @cdecl @safe fn olive_term_cursor_hide() -> int
+    @cdecl @safe fn olive_term_cursor_show() -> int
+    @cdecl @safe fn olive_term_cursor_move(x: int, y: int) -> int
+    @cdecl @safe fn olive_term_flush() -> int
+    @cdecl @safe fn olive_term_write(s: str) -> int
+    @cdecl @safe fn olive_term_begin_sync() -> int
+    @cdecl @safe fn olive_term_end_sync() -> int
+    @cdecl @safe fn olive_term_cols() -> int
+    @cdecl @safe fn olive_term_rows() -> int
+    @cdecl @safe fn olive_term_is_tty() -> int
+    @cdecl @safe fn olive_term_enable_key_enhancement() -> int
+    @cdecl @safe fn olive_term_disable_key_enhancement() -> int
+    @cdecl @safe fn olive_term_enable_mouse() -> int
+    @cdecl @safe fn olive_term_disable_mouse() -> int
+    @cdecl @safe fn olive_term_clipboard_write(s: str) -> int
+    @cdecl @safe fn olive_term_read_key() -> str
+    @cdecl @safe fn olive_term_read_key_timeout(ms: int) -> str
+
+/// Key or mouse event from the terminal.
+enum Key:
+    Enter
+    ShiftEnter
+    Backspace
+    Tab
+    BackTab
+    Escape
+    Up
+    Down
+    Left
+    Right
+    Home
+    End
+    Delete
+    PageUp
+    PageDown
+    Insert
+    F(int)
+    Ctrl(str)
+    Mod(str, str)
+    Char(str)
+    Resize
+    Eof
+    Idle
+    WheelUp
+    WheelDown
+    MouseDown(int, int)
+    MouseDrag(int, int)
+    MouseUp(int, int)
 
 /// Turn on raw mode. Keys come in as you type them, no buffering, no echo.
 fn enable_raw() -> bool:
@@ -63,7 +94,6 @@ fn write(s: str) -> bool:
     return _t.olive_term_write(s) != 0
 
 /// Start batching writes. Nothing gets drawn until you call end_sync().
-/// Useful for redrawing a frame without flicker.
 fn begin_sync() -> bool:
     return _t.olive_term_begin_sync() != 0
 
@@ -84,11 +114,10 @@ fn is_tty() -> bool:
     return _t.olive_term_is_tty() != 0
 
 /// Ask the terminal for better key events, like telling shift+enter apart from enter.
-/// Does nothing if the terminal does not support it.
 fn enable_key_enhancement() -> bool:
     return _t.olive_term_enable_key_enhancement() != 0
 
-/// Turn off the enhanced key events.
+/// Turn off enhanced key events.
 fn disable_key_enhancement() -> bool:
     return _t.olive_term_disable_key_enhancement() != 0
 
@@ -104,14 +133,140 @@ fn disable_mouse() -> bool:
 fn clipboard_write(s: str) -> bool:
     return _t.olive_term_clipboard_write(s) != 0
 
-/// Wait for the next key press, mouse event, or window resize and return it as a string.
-/// Key names look like "enter", "ctrl+c", "shift+up", "f5", etc.
-/// Mouse events look like "mousedown:10:3", "wheelup", etc.
-/// Returns "resize" when the window size changes, "eof" when input closes.
-/// If you get "eof", stop calling this. It will keep returning "eof".
-fn read_key() -> str:
-    return _t.olive_term_read_key()
+const _MOD_PREFIXES = ["", "ctrl+", "alt+", "shift+", "ctrl+alt+", "ctrl+shift+", "alt+shift+", "ctrl+alt+shift+"]
+const _MOD_NAMES = ["", "ctrl", "alt", "shift", "ctrl+alt", "ctrl+shift", "alt+shift", "ctrl+alt+shift"]
+const _NAMED_BASES = ["up", "down", "left", "right", "home", "end", "delete", "backspace", "tab", "backtab", "escape", "pageup", "pagedown", "insert"]
 
-/// Like read_key() but gives up after ms milliseconds and returns "idle".
-fn read_key_timeout(ms: int) -> str:
-    return _t.olive_term_read_key_timeout(ms)
+fn _bare_named(base: str) -> Key:
+    if base == "up":
+        return Up
+    if base == "down":
+        return Down
+    if base == "left":
+        return Left
+    if base == "right":
+        return Right
+    if base == "home":
+        return Home
+    if base == "end":
+        return End
+    if base == "delete":
+        return Delete
+    if base == "backspace":
+        return Backspace
+    if base == "tab":
+        return Tab
+    if base == "backtab":
+        return BackTab
+    if base == "escape":
+        return Escape
+    if base == "pageup":
+        return PageUp
+    if base == "pagedown":
+        return PageDown
+    return Insert
+
+fn _named_or_mod(tag: str) -> Key | None:
+    let mut mi = 0
+    while mi < len(_MOD_PREFIXES):
+        let prefix = _MOD_PREFIXES[mi]
+        let modname = _MOD_NAMES[mi]
+
+        let mut fi = 1
+        while fi <= 12:
+            let candidate = prefix + "f" + str(fi)
+            if tag == candidate:
+                if modname == "":
+                    return F(fi)
+                return Mod(modname, "f" + str(fi))
+            fi = fi + 1
+
+        let mut bi = 0
+        while bi < len(_NAMED_BASES):
+            let base = _NAMED_BASES[bi]
+            let candidate = prefix + base
+            if tag == candidate:
+                if modname == "":
+                    return _bare_named(base)
+                return Mod(modname, base)
+            bi = bi + 1
+
+        mi = mi + 1
+
+    return None
+
+fn _starts_with(s: str, prefix: str) -> bool:
+    let n = len(prefix)
+    if len(s) < n:
+        return False
+    return s[0:n] == prefix
+
+fn _decode(tag: str) -> Key:
+    if len(tag) == 1:
+        return Char(tag)
+    if tag == "enter":
+        return Enter
+    if tag == "shift+enter":
+        return ShiftEnter
+    if tag == "resize":
+        return Resize
+    if tag == "eof":
+        return Eof
+    if tag == "idle":
+        return Idle
+    if tag == "wheelup":
+        return WheelUp
+    if tag == "wheeldown":
+        return WheelDown
+
+    if _starts_with(tag, "mousedown:"):
+        let sub = tag[10:]
+        let idx = _find_colon(sub)
+        if idx > 0:
+            let col = _parse_int(sub[0:idx])
+            let row = _parse_int(sub[idx + 1:])
+            return MouseDown(col, row)
+
+    if _starts_with(tag, "mousedrag:"):
+        let sub = tag[10:]
+        let idx = _find_colon(sub)
+        if idx > 0:
+            let col = _parse_int(sub[0:idx])
+            let row = _parse_int(sub[idx + 1:])
+            return MouseDrag(col, row)
+
+    if _starts_with(tag, "mouseup:"):
+        let sub = tag[8:]
+        let idx = _find_colon(sub)
+        if idx > 0:
+            let col = _parse_int(sub[0:idx])
+            let row = _parse_int(sub[idx + 1:])
+            return MouseUp(col, row)
+
+    let named = _named_or_mod(tag)
+    if named != None:
+        return named
+
+    if _starts_with(tag, "ctrl+"):
+        return Ctrl(tag[5:])
+
+    return Char(tag)
+
+fn _find_colon(s: str) -> int:
+    let mut i = 0
+    while i < len(s):
+        if s[i:i+1] == ":":
+            return i
+        i = i + 1
+    return -1
+
+fn _parse_int(s: str) -> int:
+    return int(s)
+
+/// Wait for the next key press, mouse event, or window resize.
+fn read_key() -> Key:
+    return _decode(_t.olive_term_read_key())
+
+/// Same as read_key, but returns Idle after ms milliseconds if no event occurred.
+fn read_key_timeout(ms: int) -> Key:
+    return _decode(_t.olive_term_read_key_timeout(ms))

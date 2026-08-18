@@ -1,5 +1,5 @@
 [pod]
 name = "term"
-version = "0.1.0"
+version = "0.1.5"
 author = "vinceswu"
 entry = "src/lib.liv"
